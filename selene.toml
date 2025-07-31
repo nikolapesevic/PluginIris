@@ -1,0 +1,5 @@
+std = "roblox"
+exclude = ["*.spec.lua"]
+
+[config]
+multiple_statements = "allow"
