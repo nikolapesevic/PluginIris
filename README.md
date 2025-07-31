@@ -1,21 +1,17 @@
 # Plugin Iris
 
-Super simple layer built on top of Iris to provide a more convenient interface for using Iris within Studio plugins.
+[Iris](https://github.com/SirMallard/Iris) wrapper to make plugin development more convenient.
 
-Benefits:
-1. Simplified API to create plugin windows and corresponding buttons.
-2. Automatically pauses rendering if the window is not visible.
-3. Modifies Iris theme to match the Studio theme.
-4. Handles all the boilerplate that must be done to make Iris work well in a plugin context.
-5. Uses a hack to make Iris work in multiple plugins and windows at the same time.
+## Benefits:
+- Simplified Roblox and Iris API to make windows.
+- Window contents are perfectly aligned with Iris windows.
+- Modifies Iris theme to match the Studio theme.
+- Uses a hack to make Iris work in multiple windows and plugins at the same time.
 
 ## Usage
-```luau
-	local IrisPlugin = require(script.IrisPlugin)
-	
-	local window = IrisPlugin({
-		Plugin = plugin,
-		Title = "My Plugin",
-		
-	})
-```
+Please refer to the [Example](#). The library is typed and only contains a few functions.
+
+## Development
+0. Enable `Reload Plugins on file changed` in Studio settings.
+1. `rokit install & wally install` - Install dependencies.
+2. `rojo build example.project.json --plugin PluginIris.rbxm --watch` - To build the example for testing.
