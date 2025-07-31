@@ -8,7 +8,7 @@ end
 
 return function(iris: typeof(Iris))
 	local function update()
-		Iris.UpdateGlobalConfig({
+		iris.UpdateGlobalConfig({
 			TextColor = getStudioColor(Enum.StudioStyleGuideColor.MainText),
 			TextTransparency = 0,
 			TextDisabledColor = getStudioColor(Enum.StudioStyleGuideColor.DimmedText),
