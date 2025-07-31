@@ -7,6 +7,7 @@
 - Window contents are perfectly aligned with Iris windows.
 - Modifies Iris theme to match the Studio theme.
 - Uses a hack to make Iris work in multiple windows and plugins at the same time.
+- Automatically creates a toolbar, button and action for the window.
 
 ## Usage
 Please refer to the [Example](#). The library is typed and only contains a few functions.
