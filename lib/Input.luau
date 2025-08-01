@@ -1,5 +1,6 @@
 -- Taken from https://github.com/SirMallard/Iris/blob/main/src/libraries/UserInputService/init.lua
 -- Modified to use with different Signal library and be instanced instead of a top-level module.
+-- Contains an unchanged public API when Instanced for compatibility with private Iris internals.
 
 local UserInputService = game:GetService("UserInputService")
 local Bin = require(script.Parent.Parent.Bin)
@@ -46,10 +47,10 @@ return function()
 		p.Y = y
 	end
 
-	bin(p.InputBegan:Connect(inputBegan))
-	bin(p.InputChanged:Connect(inputChanged))
-	bin(p.InputEnded:Connect(inputEnded))
-	bin(p.MouseMoved:Connect(mouseMoved))
+	bin(p.SinkFrame.InputBegan:Connect(inputBegan))
+	bin(p.SinkFrame.InputChanged:Connect(inputChanged))
+	bin(p.SinkFrame.InputEnded:Connect(inputEnded))
+	bin(p.SinkFrame.MouseMoved:Connect(mouseMoved))
 	bin(UserInputService.InputBegan:Connect(inputBegan))
 	bin(UserInputService.InputChanged:Connect(inputChanged))
 	bin(UserInputService.InputEnded:Connect(inputEnded))

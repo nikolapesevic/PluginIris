@@ -1,0 +1,10 @@
+{
+	"emitLegacyScripts": false,
+	"name": "example",
+	"tree": {
+		"$path": "example",
+		"Packages": {
+			"$path": "default.project.json"
+		}
+	}
+}

@@ -2,20 +2,19 @@ local Input = require(script.Input)
 local Bin = require(script.Parent.Bin)
 local Theme = require(script.Theme)
 
-local IRIS_PATH = script.Parent.Iris
 local DEFAULT_ICON = "rbxassetid://112054744712799"
 
 export type WindowConfig = {
 	Id: string,
 
-	ButtonSettings: {
+	Button: {
 		Icon: string?,
 		Tooltip: string?,
 	},
 
-	WindowSettings: {
-		Title: string,
-		MinSize: Vector2,
+	Window: {
+		Title: string?,
+		MinSize: Vector2?,
 	},
 }
 
@@ -24,18 +23,19 @@ return function(plugin: Plugin, pluginToolbar: PluginToolbar | string)
 
 	_p.toolbar = typeof(pluginToolbar) == "string" and plugin:CreateToolbar(pluginToolbar)
 		or pluginToolbar :: PluginToolbar
-	_p.iris = require(IRIS_PATH)
+	_p.iris = require(script.Parent.Iris)
+	_p.irisInternal = script.Parent._Index[script.Parent.Iris.Source:match('%["([^"]+)"%]')]["iris"]
 
 	function p:GetToolbar(): PluginToolbar
 		return _p.toolbar
 	end
 
-	function p:NewWindow<T>(config: WindowConfig, irisCallback: (plugin: Plugin, iris: typeof(_p.iris)) -> ())
+	function p:NewWindow<T>(config: WindowConfig, irisCallback: (plugin: Plugin, iris: typeof(_p.iris)) -> (), ...)
 		local w, _w = {}, {}
 		local bin, cleanup = Bin()
 
 		-- Provide a clone of Iris, so we can use multiple unrelated instances of it, EWWW what a hack!
-		_w.iris = require(IRIS_PATH:Clone()) :: typeof(_p.iris)
+		_w.iris = require(_p.irisInternal:Clone()) :: typeof(_p.iris)
 
 		bin(Theme(_w.iris))
 		_w.iris.UpdateGlobalConfig({
@@ -44,16 +44,16 @@ return function(plugin: Plugin, pluginToolbar: PluginToolbar | string)
 
 		_w.Button = _p.toolbar:CreateButton(
 			config.Id .. "ToggleButton",
-			config.ButtonSettings.Tooltip or "Toggle " .. config.Id .. " plugin window",
-			config.ButtonSettings.Icon or DEFAULT_ICON
+			config.Button.Tooltip or "Toggle " .. config.Id .. " plugin window",
+			config.Button.Icon or DEFAULT_ICON
 		)
 		_w.Button.ClickableWhenViewportHidden = true
 
 		_w.Action = plugin:CreatePluginAction(
 			config.Id .. "ToggleAction",
 			config.Id,
-			config.ButtonSettings.Tooltip or "Toggle " .. config.Id .. " plugin window",
-			config.ButtonSettings.Icon or DEFAULT_ICON,
+			config.Button.Tooltip or "Toggle " .. config.Id .. " plugin window",
+			config.Button.Icon or DEFAULT_ICON,
 			true
 		)
 
@@ -61,22 +61,23 @@ return function(plugin: Plugin, pluginToolbar: PluginToolbar | string)
 			config.Id,
 			DockWidgetPluginGuiInfo.new(
 				Enum.InitialDockState.Float,
-				nil,
-				nil,
-				config.WindowSettings.MinSize.X,
-				config.WindowSettings.MinSize.Y,
-				config.WindowSettings.MinSize.X,
-				config.WindowSettings.MinSize.Y
+				false,
+				false,
+				config.Window.MinSize and config.Window.MinSize.X or 256,
+				config.Window.MinSize and config.Window.MinSize.Y or 256,
+				config.Window.MinSize and config.Window.MinSize.X or 256,
+				config.Window.MinSize and config.Window.MinSize.Y or 256
 			)
 		)
-		_w.Window.Title = config.WindowSettings.Title
-		_w.Window.Name = config.WindowSettings.Title
+		_w.Window.Title = config.Window.Title or config.Id
+		_w.Window.Name = config.Window.Title or config.Id
 		_w.Window.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-		_w.input = Input()
+		_w.input = Input() -- This somehow helps with Iris input handling, not sure, but recommended with Iris plugin example, read source for more...
 		_w.input.SinkFrame.Parent = _w.Window
-		_w.iris.Internal._utility.UserInputService = Input :: any
-		_w.iris.Disabled = true
+		_w.iris.Internal._utility.UserInputService = _w.input :: any
+		_w.iris.Disabled = not _w.Window.Enabled -- Windows can restore, and thus Iris must be immediately enabled
+		_w.Button:SetActive(_w.Window.Enabled) -- Button should reflect the window state
 
 		_w.iris.Init(_w.Window :: any)
 		bin(_w.iris:Connect(function()
@@ -116,10 +117,12 @@ return function(plugin: Plugin, pluginToolbar: PluginToolbar | string)
 			_w.Window.Enabled = false
 			_w.iris.Disabled = true
 
-			_w.input:Destroy()
+			-- _w.input:Destroy()
 			_w.iris.Shutdown()
 			cleanup()
 		end
+
+		return w
 	end
 
 	return p
