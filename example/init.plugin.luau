@@ -6,20 +6,23 @@ local pluginIris = PluginIris(plugin, "Example") -- You can provide an existing 
 -- You can also get the toolbar from the plugin, this is also useful for adding non-IrisPlugin buttons
 print("Got toolbar:", pluginIris:GetToolbar())
 
-local exampleWindow = pluginIris:NewWindow({
-	Id = "Example",
-	Button = {
-		Icon = "rbxassetid://85343243625312",
-		Tooltip = "This is an example window using PluginIris.",
+local exampleWindow = pluginIris:NewWindow(
+	{
+		Id = "Example",
+		Button = {
+			Icon = "rbxassetid://85343243625312",
+			Tooltip = "This is an example window using PluginIris.",
+		},
+		Window = {
+			Title = "Example Window",
+			MinSize = Vector2.new(356, 128),
+		},
 	},
-	Window = {
-		Title = "Example Window",
-		MinSize = Vector2.new(356, 128),
-	},
-}, function(plugin: Plugin, iris)
-	iris.Button({ "Hello world!" })
-	iris.Text({ "This is an example window using PluginIris." })
-end)
+	function(plugin: Plugin, iris) -- IMPORTANT! You must use this instance of the iris module that is passed to the function! Do not use Iris directly!
+		iris.Button({ "Hello world!" })
+		iris.Text({ "This is an example window using PluginIris." })
+	end
+)
 
 UserInputService.InputBegan:Connect(function(input, processed)
 	if input.KeyCode == Enum.KeyCode.T then
