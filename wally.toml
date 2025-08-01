@@ -1,7 +1,7 @@
 [package]
 name = "nikolapesevic/pluginiris"
-version = "1.0.0"
-description = "Super simple layer built on top of Iris to provide a more convenient interface for using Iris for Studio plugins."
+version = "1.0.1"
+description = "Wrapper for SirMallard/Iris to make plugin development more convenient."
 authors = ["Johnny"]
 registry = "https://github.com/UpliftGames/wally-index"
 realm = "shared"
