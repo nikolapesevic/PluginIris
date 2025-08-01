@@ -1,12 +1,16 @@
 [package]
 name = "nikolapesevic/pluginiris"
 version = "1.0.2"
+
 license = "MIT"
 description = "Wrapper for SirMallard/Iris to make plugin development more convenient."
 authors = ["Johnny"]
+
 registry = "https://github.com/UpliftGames/wally-index"
 realm = "shared"
-exclude = ["rokit.toml", "example/", "example.project.json", ".vscode/"]
+
+exclude = ["**"]
+include = ["default.project.json", "lib", "lib/**", "LICENSE", "wally.toml"]
 
 [dependencies]
 Iris = "sirmallard/iris@^2.5.0"

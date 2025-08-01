@@ -1,9 +1,6 @@
 {
 	"name": "PluginIris",
 	"tree": {
-		"$path": "Packages",
-		"PluginIris": {
-			"$path": "lib/"
-		}
+		"$path": "lib"
 	}
 }
