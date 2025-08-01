@@ -1,6 +1,6 @@
 -- Taken from https://github.com/SirMallard/Iris/blob/main/src/libraries/UserInputService/init.lua
--- Modified to use with different Signal library and be instanced instead of a top-level module.
 -- Contains an unchanged public API when Instanced for compatibility with private Iris internals.
+-- Modified for easier cleanup and instancing per Iris window.
 
 local UserInputService = game:GetService("UserInputService")
 local Bin = require(script.Parent.Parent.Bin)
@@ -22,11 +22,11 @@ return function()
 	p.SinkFrame.BackgroundTransparency = 1
 	p.SinkFrame.ZIndex = 1024 ^ 2
 
-	p.InputBegan = Signal()
-	p.InputChanged = Signal()
-	p.InputEnded = Signal()
-	p.MouseMoved = Signal()
-	p.TouchTapInWorld = Signal()
+	p.InputBegan = Signal.new()
+	p.InputChanged = Signal.new()
+	p.InputEnded = Signal.new()
+	p.MouseMoved = Signal.new()
+	p.TouchTapInWorld = Signal.new()
 
 	local function inputBegan(input: InputObject)
 		p.KeyDown[input.KeyCode] = true

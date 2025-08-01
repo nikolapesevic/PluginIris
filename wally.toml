@@ -9,4 +9,4 @@ realm = "shared"
 [dependencies]
 Iris = "sirmallard/iris@^2.5.0"
 Bin = "red-blox/bin@^1.0.0"
-Signal = "red-blox/signal@^1.0.0"
+Signal = "stravant/goodsignal@0.3.0"
