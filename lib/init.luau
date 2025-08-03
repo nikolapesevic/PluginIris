@@ -1,5 +1,6 @@
 local Input = require(script.Input)
 local Bin = require(script.Parent.Bin)
+local Iris = require(script.Parent.Iris)
 local Theme = require(script.Theme)
 
 local DEFAULT_ICON = "rbxassetid://112054744712799"
@@ -19,7 +20,7 @@ type WindowConfig = {
 	}?,
 }
 
-return function(plugin: Plugin, pluginToolbar: PluginToolbar | string)
+return function(plugin: Plugin, internalIrisModule: ModuleScript, pluginToolbar: PluginToolbar | string)
 	local p, _p = {}, {}
 
 	if typeof(pluginToolbar) == "string" then
@@ -29,21 +30,18 @@ return function(plugin: Plugin, pluginToolbar: PluginToolbar | string)
 		_p.toolbar = pluginToolbar
 	end
 
-	_p.iris = require(script.Parent.Iris)
-	_p.irisInternal = script.Parent._Index[script.Parent.Iris.Source:match('%["([^"]+)"%]')]["iris"]
-
 	function p:GetToolbar(): PluginToolbar
 		return _p.toolbar
 	end
 
 	function p:NewWindow<T>(config: WindowConfig)
 		local w, _w = {}, {
-			callback = nil :: ((plugin: Plugin, iris: typeof(_p.iris)) -> ())?,
+			callback = nil :: ((iris: typeof(Iris)) -> ())?,
 		}
 		local bin, cleanup = Bin()
 
 		-- Provide a clone of Iris, so we can use multiple unrelated instances of it, EWWW what a hack!
-		w.Iris = require(_p.irisInternal:Clone()) :: typeof(_p.iris)
+		w.Iris = require(internalIrisModule:Clone()) :: typeof(Iris)
 
 		bin(Theme(w.Iris))
 		w.Iris.UpdateGlobalConfig({
@@ -104,7 +102,7 @@ return function(plugin: Plugin, pluginToolbar: PluginToolbar | string)
 				window.state.position:set(Vector2.zero)
 
 				if _w.callback then
-					_w.callback(plugin, w.Iris)
+					_w.callback(w.Iris)
 				end
 
 				w.Iris.End()
@@ -135,7 +133,8 @@ return function(plugin: Plugin, pluginToolbar: PluginToolbar | string)
 			return _w.window.Enabled
 		end
 
-		function w:SetCallback(renderCallback: (plugin: Plugin, iris: typeof(_p.iris)) -> ())
+		function w:SetCallback(renderCallback: (iris: typeof(Iris)) -> ())
+			assert(not _w.callback, "You can only set the callback once for each window.")
 			_w.callback = renderCallback
 		end
 

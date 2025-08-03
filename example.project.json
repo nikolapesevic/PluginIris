@@ -4,7 +4,11 @@
 	"tree": {
 		"$path": "example",
 		"Packages": {
-			"$path": "default.project.json"
+			"$path": "Packages",
+
+			"PluginIris": {
+				"$path": "lib/"
+			}
 		}
 	}
 }
