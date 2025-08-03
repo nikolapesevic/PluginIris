@@ -17,7 +17,7 @@ Please refer to the [Example](https://github.com/nikolapesevic/pluginiris/blob/m
 
 ## Known Issues
 - Support for Iris windows inside of PluginIris windows can be buggy and messy. This could be fixed in the future by adding another method to create windows which are not tied to toolbars and buttons.
-- Making multiple windows work is a total hack and annoying to maintain. Currently, the latest .rbxm release of Iris is grabbed and put into the lib folder. This is not ideal, but it works for now. I've explored many different avenues to make this work, but none of them were good enoughTM.
+- Making multiple windows work is a total hack and annoying to maintain. Currently, the latest .zip release of Iris is grabbed and put into the lib folder. This is not ideal, but it works for now. I've explored many different avenues to make this work, but none of them were good enoughTM.
 
 ## Development
 1. `rokit install & wally install` - Install dependencies.
