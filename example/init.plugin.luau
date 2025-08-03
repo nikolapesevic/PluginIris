@@ -8,7 +8,7 @@ local pluginIris = PluginIris(
 	-- Esentially the Iris module is cloned for each window, so you can use multiple windows parented to different plugin widgets.
 	-- However, due internal differences in package managers, I cannot reliably clone the module, so you must provide the internal Iris module as an argument.
 	-- The best way to do this is to implement some regex like below in order to get the internal module from the plugin, and not just the shortcut module point to the main Iris module.
-	script.Parent.Packages._Index[script.Parent.Iris.Source:match('%["([^"]+)"%]')]["iris"],
+	script.Parent.Packages._Index[script.Parent.Packages.Iris.Source:match('%["([^"]+)"%]')]["iris"],
 
 	"Example" -- You can provide an existing toolbar or the id for a new one
 )
