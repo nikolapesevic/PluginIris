@@ -1,0 +1,3 @@
+[submodule "lib/Iris"]
+	path = lib/Iris
+	url = https://github.com/SirMallard/Iris.git
