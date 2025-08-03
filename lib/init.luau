@@ -5,6 +5,8 @@ local Theme = require(script.Theme)
 
 local DEFAULT_ICON = "rbxassetid://112054744712799"
 
+export type Iris = typeof(Iris)
+
 type WindowConfig = {
 	Id: string,
 
