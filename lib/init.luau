@@ -1,6 +1,6 @@
 local Input = require(script.Input)
 local Bin = require(script.Parent.Bin)
-local Iris = require(script.Parent.Iris)
+local Iris = require(script.Iris)
 local Theme = require(script.Theme)
 
 local DEFAULT_ICON = "rbxassetid://112054744712799"
@@ -20,7 +20,7 @@ type WindowConfig = {
 	}?,
 }
 
-return function(plugin: Plugin, internalIrisModule: ModuleScript, pluginToolbar: PluginToolbar | string)
+return function(plugin: Plugin, pluginToolbar: PluginToolbar | string)
 	local p, _p = {}, {}
 
 	if typeof(pluginToolbar) == "string" then
@@ -41,7 +41,7 @@ return function(plugin: Plugin, internalIrisModule: ModuleScript, pluginToolbar:
 		local bin, cleanup = Bin()
 
 		-- Provide a clone of Iris, so we can use multiple unrelated instances of it, EWWW what a hack!
-		w.Iris = require(internalIrisModule:Clone()) :: typeof(Iris)
+		w.Iris = require(script.Iris:Clone()) :: typeof(Iris)
 
 		bin(Theme(w.Iris))
 		w.Iris.UpdateGlobalConfig({

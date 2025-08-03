@@ -1,17 +1,7 @@
 local UserInputService = game:GetService("UserInputService")
 local PluginIris = require(script.Parent.Packages.PluginIris)
 
-local pluginIris = PluginIris(
-	plugin,
-
-	-- IMPORTANT! We use a hack to allow multiple instances of Iris to be used in the same plugin.
-	-- Esentially the Iris module is cloned for each window, so you can use multiple windows parented to different plugin widgets.
-	-- However, due internal differences in package managers, I cannot reliably clone the module, so you must provide the internal Iris module as an argument.
-	-- The best way to do this is to implement some regex like below in order to get the internal module from the plugin, and not just the shortcut module point to the main Iris module.
-	script.Parent.Packages._Index[script.Parent.Packages.Iris.Source:match('%["([^"]+)"%]')]["iris"],
-
-	"Example" -- You can provide an existing toolbar or the id for a new one
-)
+local pluginIris = PluginIris(plugin, "Example") -- You can provide an existing toolbar or the id for a new one
 
 -- You can also get the toolbar from the plugin, this is also useful for adding non-IrisPlugin buttons
 print("Got toolbar:", pluginIris:GetToolbar())
@@ -28,8 +18,12 @@ local exampleWindow = pluginIris:NewWindow({
 	},
 })
 
--- IMPORTANT! Do not use the Iris module directly, instead use the instance of Iris provided by the window.
--- This is the hack that allows us to use multiple instances of Iris. You also get the Iris instance as an argument in the callback.
+--[[
+	IMPORTANT! Do not use the Iris module directly, instead use the instance of Iris provided by the window.
+	We use a hack to allow multiple instances of Iris to be used in the same plugin. Essentially, each window has its own cloned Instance of the Iris module.
+	However, due to the way package managers obfuscate the real path to modules, it's very complex and prone to breaking if we try to look for that path.
+	Instead of using Wally to manage Iris, we just clone it as a git submodule!
+]]
 local testState = exampleWindow.Iris.State("Hello world")
 exampleWindow:SetCallback(function(iris) -- You can only set the callback once for each window!
 	iris.Button({ "Hello world!" })

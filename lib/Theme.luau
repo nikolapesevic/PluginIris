@@ -1,4 +1,4 @@
-local Iris = require(script.Parent.Parent.Iris)
+local Iris = require(script.Parent.Iris)
 local Studio = settings().Studio
 
 local function skew(color: Color3, float: number): Color3

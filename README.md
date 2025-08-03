@@ -20,6 +20,7 @@ Please refer to the [Example](https://github.com/nikolapesevic/pluginiris/blob/m
 - To make multiple Iris instances work, we clone the Iris dependency/module itself. This means you must use the iris argument that is passed to the function when creating a window. If you use the global Iris module, it will not work properly. Furthermore, it's prone to breaking if the file layout of your package manager changes...
 
 ## Development
-0. Enable `Reload Plugins on file changed` in Studio settings.
+0. Clone the repository and run `git submodule update --init --recursive` to get the Iris submodule, or just clone recursively in your IDE.
 1. `rokit install & wally install` - Install dependencies.
-2. `rojo build example.project.json --plugin PluginIris.rbxm --watch` - To build the example for testing.
+2. Enable `Reload Plugins on file changed` in Studio settings.
+3. `rojo build example.project.json --plugin PluginIris.rbxm --watch` - To build the example for testing.
