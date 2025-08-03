@@ -1,6 +1,6 @@
 [package]
 name = "nikolapesevic/pluginiris"
-version = "2.0.0"
+version = "2.0.1"
 
 license = "MIT"
 description = "Wrapper for SirMallard/Iris to make plugin development more convenient."

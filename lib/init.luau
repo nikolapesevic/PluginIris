@@ -20,7 +20,7 @@ return function(plugin: Plugin, pluginToolbar: PluginToolbar | string)
 
 	if typeof(pluginToolbar) == "string" then
 		_p.toolbar = plugin:CreateToolbar(pluginToolbar)
-		_p.toolbar.Name = pluginToolbar .. "Toolbar"
+		_p.toolbar.Name = pluginToolbar
 	else
 		_p.toolbar = pluginToolbar
 	end
