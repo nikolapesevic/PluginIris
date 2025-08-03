@@ -1,6 +1,6 @@
-local Input = require(script.Input)
+local CoreGui = game:GetService("CoreGui")
 local Bin = require(script.Parent.Bin)
-local Iris = require(script.Iris)
+local Iris = require(script.Parent.Iris)
 local Theme = require(script.Theme)
 
 local DEFAULT_ICON = "rbxassetid://112054744712799"
@@ -8,20 +8,15 @@ local DEFAULT_ICON = "rbxassetid://112054744712799"
 type WindowConfig = {
 	Id: string,
 
-	Button: {
-		Icon: string?,
-		Tooltip: string?,
-	}?,
+	Icon: string?,
+	Tooltip: string?,
 
-	Window: {
-		Demo: boolean?,
-		Title: string?,
-		MinSize: Vector2?,
-	}?,
+	IrisDemo: boolean?,
 }
 
 return function(plugin: Plugin, pluginToolbar: PluginToolbar | string)
 	local p, _p = {}, {}
+	local bin, cleanup = Bin()
 
 	if typeof(pluginToolbar) == "string" then
 		_p.toolbar = plugin:CreateToolbar(pluginToolbar)
@@ -30,107 +25,90 @@ return function(plugin: Plugin, pluginToolbar: PluginToolbar | string)
 		_p.toolbar = pluginToolbar
 	end
 
+	_p.screenGui = Instance.new("ScreenGui")
+	_p.screenGui.Name = _p.toolbar.Name .. "ScreenGui"
+	_p.screenGui.ResetOnSpawn = false
+	_p.screenGui.IgnoreGuiInset = true
+	_p.screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	_p.screenGui.Parent = CoreGui
+
+	_p.themeCleanup = Theme(Iris)
+
+	Iris.Init(_p.screenGui :: any)
+	Iris.UpdateGlobalConfig({
+		IgnoreGuiInset = true,
+	})
+
 	function p:GetToolbar(): PluginToolbar
 		return _p.toolbar
 	end
 
-	function p:NewWindow<T>(config: WindowConfig)
+	function p:NewWindow(config: WindowConfig)
 		local w, _w = {}, {
 			callback = nil :: ((iris: typeof(Iris)) -> ())?,
 		}
-		local bin, cleanup = Bin()
+		local wbin, wcleanup = Bin()
+		bin(wcleanup)
 
-		-- Provide a clone of Iris, so we can use multiple unrelated instances of it, EWWW what a hack!
-		w.Iris = require(script.Iris:Clone()) :: typeof(Iris)
-
-		bin(Theme(w.Iris))
-		w.Iris.UpdateGlobalConfig({
-			UseScreenGUIs = false,
-		})
+		w.Iris = Iris
 
 		_w.button = _p.toolbar:CreateButton(
-			config.Id .. "ToggleButton",
-			(config.Button and config.Button.Tooltip) or "Toggle " .. config.Id .. " plugin window",
-			(config.Button and config.Button.Icon) or DEFAULT_ICON
+			config.Id,
+			config.Tooltip or "Toggle " .. config.Id .. " plugin window",
+			config.Icon or DEFAULT_ICON
 		)
 		_w.button.ClickableWhenViewportHidden = true
 
 		_w.action = plugin:CreatePluginAction(
 			config.Id .. "ToggleAction",
 			config.Id,
-			(config.Button and config.Button.Tooltip) or "Toggle " .. config.Id .. " plugin window",
-			(config.Button and config.Button.Icon) or DEFAULT_ICON,
+			config.Tooltip or "Toggle " .. config.Id .. " plugin window",
+			config.Icon or DEFAULT_ICON,
 			true
 		)
 
-		_w.window = plugin:CreateDockWidgetPluginGui(
-			config.Id,
-			DockWidgetPluginGuiInfo.new(
-				Enum.InitialDockState.Float,
-				false,
-				false,
-				(config.Window and config.Window.MinSize) and config.Window.MinSize.X or 256,
-				(config.Window and config.Window.MinSize) and config.Window.MinSize.Y or 256,
-				(config.Window and config.Window.MinSize) and config.Window.MinSize.X or 256,
-				(config.Window and config.Window.MinSize) and config.Window.MinSize.Y or 256
-			)
-		)
-		_w.window.Title = config.Window and config.Window.Title or config.Id
-		_w.window.Name = config.Window and config.Window.Title or config.Id
-		_w.window.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-
-		_w.input = Input() -- This somehow helps with Iris input handling, not sure, but recommended with Iris plugin example, read source for more...
-		_w.input.SinkFrame.Parent = _w.window
-		w.Iris.Internal._utility.UserInputService = _w.input :: any
-		w.Iris.Disabled = not _w.window.Enabled -- Windows can restore, and thus Iris must be immediately enabled
-		_w.button:SetActive(_w.window.Enabled) -- Button should reflect the window state
-
-		w.Iris.Init(_w.window :: any)
-		bin(w.Iris:Connect(function()
-			if config.Window and config.Window.Demo then
-				local window = w.Iris.ShowDemoWindow()
-				window.state.size:set(_w.window.AbsoluteSize)
-				window.state.position:set(Vector2.zero)
-				window.arguments.NoTitleBar = true
-				window.arguments.NoCollapse = true
-				window.arguments.NoClose = true
-				window.arguments.NoMove = true
-				window.arguments.NoResize = true
+		local window
+		wbin(w.Iris:Connect(function()
+			if config.IrisDemo then
+				w.Iris.ShowDemoWindow()
 			else
-				local window = w.Iris.Window({ "", true, false, true, true, true, false, true })
-				window.state.size:set(_w.window.AbsoluteSize)
-				window.state.position:set(Vector2.zero)
+				window = w.Iris.Window({ _p.toolbar.Name .. " - " .. config.Id, false, false, true }, {
+					isOpened = Iris.State(false),
+				})
 
 				if _w.callback then
 					_w.callback(w.Iris)
+				end
+
+				if window.state.isOpened:changed() then
+					_w.button:SetActive(window.state.isOpened:get())
 				end
 
 				w.Iris.End()
 			end
 		end))
 
-		_w.window:BindToClose(function()
-			_w.window.Enabled = false
-			w.Iris.Disabled = true
-			_w.button:SetActive(false)
-		end)
-
 		local function onToggle()
-			_w.window.Enabled = not _w.window.Enabled
-			w.Iris.Disabled = not _w.window.Enabled
-			_w.button:SetActive(_w.window.Enabled)
+			if not window then
+				return
+			end
+			window.state.isOpened:set(not window.state.isOpened:get())
+			_w.button:SetActive(window.state.isOpened:get())
 		end
 		_w.button.Click:Connect(onToggle)
 		_w.action.Triggered:Connect(onToggle)
 
 		function w:IsOpen(): boolean
-			return _w.window.Enabled
+			return window.state.isOpened:get()
 		end
 
 		function w:Toggle(newState: boolean?): boolean
-			_w.window.Enabled = if newState ~= nil then newState else not _w.window.Enabled
-			_w.button:SetActive(_w.window.Enabled)
-			return _w.window.Enabled
+			if not window then
+				return false
+			end
+			window.state.isOpened:set(if newState ~= nil then newState else not window.state.isOpened:get())
+			_w.button:SetActive(window.state.isOpened:get())
+			return window.state.isOpened:get()
 		end
 
 		function w:SetCallback(renderCallback: (iris: typeof(Iris)) -> ())
@@ -139,17 +117,17 @@ return function(plugin: Plugin, pluginToolbar: PluginToolbar | string)
 		end
 
 		function w:Destroy()
-			_w.window.Enabled = false
-
-			w.Iris.Disabled = true
-			w.Iris.Shutdown()
-
-			_w.input:Destroy()
-
-			cleanup()
+			wcleanup()
 		end
 
 		return w
+	end
+
+	function p:Destroy()
+		cleanup()
+		Iris.Shutdown()
+		_p.themeCleanup()
+		_p.screenGui:Destroy()
 	end
 
 	return p
