@@ -4,8 +4,8 @@ registry = "test"
 
 [[package]]
 name = "nikolapesevic/pluginiris"
-version = "1.0.0"
-dependencies = [["Bin", "red-blox/bin@1.0.0"], ["Iris", "sirmallard/iris@2.5.0"], ["Signal", "stravant/goodsignal@0.3.0"]]
+version = "1.2.0"
+dependencies = [["Bin", "red-blox/bin@1.0.0"], ["Signal", "stravant/goodsignal@0.3.0"]]
 
 [[package]]
 name = "red-blox/bin"
@@ -15,11 +15,6 @@ dependencies = [["Spawn", "red-blox/spawn@1.1.0"]]
 [[package]]
 name = "red-blox/spawn"
 version = "1.1.0"
-dependencies = []
-
-[[package]]
-name = "sirmallard/iris"
-version = "2.5.0"
 dependencies = []
 
 [[package]]
