@@ -21,8 +21,6 @@ local exampleWindow = pluginIris:NewWindow({
 --[[
 	IMPORTANT! Do not use the Iris module directly, instead use the instance of Iris provided by the window.
 	We use a hack to allow multiple instances of Iris to be used in the same plugin. Essentially, each window has its own cloned Instance of the Iris module.
-	However, due to the way package managers obfuscate the real path to modules, it's very complex and prone to breaking if we try to look for that path.
-	Instead of using Wally to manage Iris, we just clone it as a git submodule!
 ]]
 local testState = exampleWindow.Iris.State("Hello world")
 exampleWindow:SetCallback(function(iris) -- You can only set the callback once for each window!

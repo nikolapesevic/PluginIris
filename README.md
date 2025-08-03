@@ -17,10 +17,9 @@ Please refer to the [Example](https://github.com/nikolapesevic/pluginiris/blob/m
 
 ## Known Issues
 - Support for Iris windows inside of PluginIris windows can be buggy and messy. This could be fixed in the future by adding another method to create windows which are not tied to toolbars and buttons.
-- To make multiple Iris instances work, we clone the Iris dependency/module itself. This means you must use the iris argument that is passed to the function when creating a window. If you use the global Iris module, it will not work properly. Furthermore, it's prone to breaking if the file layout of your package manager changes...
+- Making multiple windows work is a total hack and annoying to maintain. Currently, the latest .rbxm release of Iris is grabbed and put into the lib folder. This is not ideal, but it works for now. I've explored many different avenues to make this work, but none of them were good enoughTM.
 
 ## Development
-0. Clone the repository and run `git submodule update --init --recursive` to get the Iris submodule, or just clone recursively in your IDE.
 1. `rokit install & wally install` - Install dependencies.
 2. Enable `Reload Plugins on file changed` in Studio settings.
 3. `rojo build example.project.json --plugin PluginIris.rbxm --watch` - To build the example for testing.

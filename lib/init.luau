@@ -1,6 +1,6 @@
 local Input = require(script.Input)
 local Bin = require(script.Parent.Bin)
-local Iris = require(script.Iris.lib)
+local Iris = require(script.Iris)
 local Theme = require(script.Theme)
 
 local DEFAULT_ICON = "rbxassetid://112054744712799"
