@@ -70,15 +70,16 @@ return function(plugin: Plugin, pluginToolbar: PluginToolbar | string)
 		)
 
 		local window
+		local isOpenedState = Iris.State(false)
 		wbin(w.Iris:Connect(function()
 			if config.IrisDemo then
 				w.Iris.ShowDemoWindow()
 			else
 				window = w.Iris.Window({ _p.toolbar.Name .. " - " .. config.Id, false, false, true }, {
-					isOpened = Iris.State(false),
+					isOpened = isOpenedState,
 				})
 
-				if _w.callback then
+				if _w.callback and isOpenedState:get() then
 					_w.callback(w.Iris)
 				end
 
