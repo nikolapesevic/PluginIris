@@ -8,7 +8,7 @@
 - Automatically creates a toolbar, button and action for the window.
 
 ## Installation
-The library is available on [Wally](https://wally.run) as a [Package](https://wally.run/package/nikolapesevic/pluginiris).
+The library is available on [Wally](https://wally.run) as a [Package](https://wally.run/package/triankl3/pluginiris).
 
 ## Usage
 Please refer to the [Example](https://github.com/nikolapesevic/pluginiris/blob/main/example/init.plugin.luau). The library is strictly typed and only contains a few functions.
