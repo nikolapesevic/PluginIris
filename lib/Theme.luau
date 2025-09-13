@@ -6,15 +6,21 @@ local function skew(color: Color3, float: number): Color3
 	return Color3.fromHSV(h, s, math.clamp(v + (v < 0.5 and float or -float), 0, 1))
 end
 
-local function getStudioColor(colorType, modifier: Enum.StudioStyleGuideModifier?)
-	modifier = modifier or Enum.StudioStyleGuideModifier.Default
-	local color = Studio.Theme:GetColor(colorType, modifier)
-	return colorType == Enum.StudioStyleGuideColor.Button and skew(color, 0.05) or color -- We have to skew button colors a bit to get a proper contrast!
-end
-
 return function(iris: typeof(Iris))
 	local function update()
-		iris.UpdateGlobalConfig({})
+		if Studio.Theme.Name == "Light" then
+			Iris.UpdateGlobalConfig(Iris.TemplateConfig.colorLight)
+			Iris.UpdateGlobalConfig({
+				FrameBgColor = Iris.TemplateConfig.colorLight.SeparatorColor,
+			})
+		else
+			Iris.UpdateGlobalConfig(Iris.TemplateConfig.colorDark)
+			Iris.UpdateGlobalConfig({
+				WindowBgColor = Studio.Theme:GetColor(Enum.StudioStyleGuideColor.MainBackground),
+				TitleBgColor = skew(Studio.Theme:GetColor(Enum.StudioStyleGuideColor.MainBackground), 0.1),
+				MenubarBgColor = skew(Studio.Theme:GetColor(Enum.StudioStyleGuideColor.MainBackground), -0.05),
+			})
+		end
 	end
 	local event = Studio.ThemeChanged:Connect(update)
 	update()
