@@ -1,21 +1,34 @@
 local UserInputService = game:GetService("UserInputService")
 local PluginIris = require(script.Parent.Packages.PluginIris)
 
-local pluginIris = PluginIris(plugin, "Example Plugin") -- You can provide an existing toolbar or the id for a new one
-print("Got toolbar:", pluginIris:GetToolbar()) -- You can also get the toolbar from the plugin
+local toolbar = PluginIris(plugin, "Example Plugin") -- You can provide an existing toolbar or the id for a new one
+print("Got toolbar:", toolbar:Get()) -- You can also retrieve the Roblox toolbar instance
 
--- Construct a new window with the pluginIris instance and a configuration
-local exampleWindow = pluginIris:NewWindow({
+-- Construct a new window with the toolbar instance and a configuration
+local exampleWindow = toolbar:NewWindow({
 	Id = "Example",
 
 	Icon = "rbxassetid://85343243625312",
 	Tooltip = "This is an example window using PluginIris.",
+
+	IrisArgs = {
+		NoTitleBar = true,
+		NoBackground = true,
+		NoClose = true,
+		NoCollapse = true,
+		NoMove = true,
+		NoScrollbar = false,
+		NoResize = true,
+	},
+	DefaultSize = Vector2.new(500, 100),
+	DefaultPosition = Vector2.new(0, 0),
 })
 
-local Iris = exampleWindow.Iris -- You access .Iris on windows to get the Iris module
+local Iris = toolbar.Iris -- You access .Iris on the toolbar instance
 exampleWindow:SetCallback(function() -- You can only set the callback once for each window!
 	Iris.Button({ "Hello world!" })
 	Iris.Text({ "This is an example window using PluginIris." })
+	Iris.Text({ "It uses more complex settings to anchor it self to the top left." })
 end)
 
 -- :Toggle(), :Toggle(state: boolean) and :IsOpen() are provided by the window, so you can control the window state.
@@ -30,7 +43,7 @@ local userInputEvent = UserInputService.InputBegan:Connect(function(input, proce
 	end
 end)
 
-pluginIris:NewWindow({
+toolbar:NewWindow({
 	Id = "Demo",
 
 	IrisDemo = true,
@@ -39,6 +52,6 @@ pluginIris:NewWindow({
 -- IMPORTANT! Make sure you clean up the PluginIris instance when the plugin is unloaded.
 -- This also cleans up all of the existing windows
 plugin.Unloading:Connect(function()
-	pluginIris:Destroy()
+	toolbar:Destroy()
 	userInputEvent:Disconnect()
 end)
