@@ -1,7 +1,7 @@
 local UserInputService = game:GetService("UserInputService")
 local PluginIris = require(script.Parent.Packages.PluginIris)
 
-local toolbar = PluginIris(plugin, "Example Plugin") -- You can provide an existing toolbar or the id for a new one
+local toolbar = PluginIris.newToolbar(plugin, "Example Plugin") -- You can provide an existing toolbar or the id for a new one
 print("Got toolbar:", toolbar:Get()) -- You can also retrieve the Roblox toolbar instance
 
 -- Construct a new window with the toolbar instance and a configuration
@@ -11,8 +11,8 @@ local exampleWindow = toolbar:NewWindow({
 	Icon = "rbxassetid://85343243625312",
 	Tooltip = "This is an example window using PluginIris.",
 
-	IrisArgs = {
-		NoTitleBar = true,
+	IrisArgs = { -- Any of these can be omitted
+		-- NoTitleBar = false,
 		NoBackground = true,
 		NoClose = true,
 		NoCollapse = true,
@@ -24,11 +24,16 @@ local exampleWindow = toolbar:NewWindow({
 	DefaultPosition = Vector2.new(0, 0),
 })
 
-local Iris = toolbar.Iris -- You access .Iris on the toolbar instance
-exampleWindow:SetCallback(function() -- You can only set the callback once for each window!
+local Iris = PluginIris.Iris -- You access .Iris from the module
+exampleWindow:SetCallback(function(window) -- You can only set the callback once for each window!
+	-- Use window argument to dynamically center it
+	local size = window.state.size:get()
+	local viewport = workspace.CurrentCamera.ViewportSize
+	window.state.position:set(viewport / 2 - size / 2)
+
 	Iris.Button({ "Hello world!" })
 	Iris.Text({ "This is an example window using PluginIris." })
-	Iris.Text({ "It uses more complex settings to anchor it self to the top left." })
+	Iris.Text({ "It uses more complex settings force its position\nto be centered on the screen." })
 end)
 
 -- :Toggle(), :Toggle(state: boolean) and :IsOpen() are provided by the window, so you can control the window state.
@@ -43,9 +48,9 @@ local userInputEvent = UserInputService.InputBegan:Connect(function(input, proce
 	end
 end)
 
+-- Just for demonstration, create a window with the Iris demo. The usual window settings are not supported on demos.
 toolbar:NewWindow({
 	Id = "Demo",
-
 	IrisDemo = true,
 })
 

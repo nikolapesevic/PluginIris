@@ -28,146 +28,150 @@ type WindowConfig = {
 	IrisDemo: boolean?,
 }
 
+type IrisWindow = typeof(Iris.Window({}))
+
 local initialized = false
-return function(plugin: Plugin, pluginToolbar: PluginToolbar | string)
-	assert(not initialized, "Iris can only be initialized once per plugin.")
-	initialized = true
+return {
+	Iris = Iris,
 
-	local p, _p = {}, {}
-	local bin, cleanup = Bin()
+	newToolbar = function(plugin: Plugin, pluginToolbar: PluginToolbar | string)
+		assert(not initialized, "Iris can only be initialized once per plugin.")
+		initialized = true
 
-	if typeof(pluginToolbar) == "string" then
-		_p.toolbar = plugin:CreateToolbar(pluginToolbar)
-		_p.toolbar.Name = pluginToolbar
-	else
-		_p.toolbar = pluginToolbar
-	end
+		local p, _p = {}, {}
+		local bin, cleanup = Bin()
 
-	_p.screenGui = Instance.new("ScreenGui")
-	_p.screenGui.Name = _p.toolbar.Name .. "ScreenGui"
-	_p.screenGui.ResetOnSpawn = false
-	_p.screenGui.IgnoreGuiInset = true
-	_p.screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	_p.screenGui.Parent = CoreGui
-
-	_p.themeCleanup = Theme(Iris)
-
-	Iris.Init(_p.screenGui :: any)
-	Iris.UpdateGlobalConfig({
-		IgnoreGuiInset = true,
-	})
-
-	p.Iris = Iris
-
-	function p:Get(): PluginToolbar
-		return _p.toolbar
-	end
-
-	function p:NewWindow(config: WindowConfig)
-		local w, _w = {}, {
-			callback = nil :: ((iris: typeof(Iris)) -> ())?,
-		}
-		local wbin, wcleanup = Bin()
-		bin(wcleanup)
-
-		_w.button = _p.toolbar:CreateButton(
-			config.Id,
-			config.Tooltip or "Toggle " .. config.Id .. " plugin window",
-			config.Icon or DEFAULT_ICON
-		)
-		_w.button.ClickableWhenViewportHidden = true
-
-		_w.action = plugin:CreatePluginAction(
-			config.Id .. "ToggleAction",
-			config.Id,
-			config.Tooltip or "Toggle " .. config.Id .. " plugin window",
-			config.Icon or DEFAULT_ICON,
-			true
-		)
-
-		local function cfgDefault(config: any, key: string, default: boolean): boolean
-			local value = config and config[key] or nil
-			if value ~= nil then
-				return value
-			else
-				return default
-			end
+		if typeof(pluginToolbar) == "string" then
+			_p.toolbar = plugin:CreateToolbar(pluginToolbar)
+			_p.toolbar.Name = pluginToolbar
+		else
+			_p.toolbar = pluginToolbar
 		end
 
-		local window
-		local isOpenedState = Iris.State(false)
-		wbin(Iris:Connect(function()
-			if config.IrisDemo then
-				Iris.ShowDemoWindow()
-			else
-				window = Iris.Window({
-					_p.toolbar.Name .. " - " .. config.Id,
-					cfgDefault(config.IrisArgs, "NoTitleBar", false),
-					cfgDefault(config.IrisArgs, "NoBackground", false),
-					cfgDefault(config.IrisArgs, "NoCollapse", true),
-					cfgDefault(config.IrisArgs, "NoClose", false),
-					cfgDefault(config.IrisArgs, "NoMove", false),
-					cfgDefault(config.IrisArgs, "NoScrollbar", false),
-					cfgDefault(config.IrisArgs, "NoResize", false),
-				}, {
-					isOpened = isOpenedState,
-					size = config.DefaultSize and Iris.State(config.DefaultSize) or nil,
-					position = config.DefaultPosition and Iris.State(config.DefaultPosition) or nil,
-				})
+		_p.screenGui = Instance.new("ScreenGui")
+		_p.screenGui.Name = _p.toolbar.Name .. "ScreenGui"
+		_p.screenGui.ResetOnSpawn = false
+		_p.screenGui.IgnoreGuiInset = true
+		_p.screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+		_p.screenGui.Parent = CoreGui
 
-				if _w.callback and isOpenedState:get() then
-					_w.callback(Iris)
+		_p.themeCleanup = Theme(Iris)
+
+		Iris.Init(_p.screenGui :: any)
+		Iris.UpdateGlobalConfig({
+			IgnoreGuiInset = true,
+		})
+
+		function p:Get(): PluginToolbar
+			return _p.toolbar
+		end
+
+		function p:NewWindow(config: WindowConfig)
+			local w, _w = {}, {
+				callback = nil :: ((iris: typeof(Iris)) -> ())?,
+			}
+			local wbin, wcleanup = Bin()
+			bin(wcleanup)
+
+			_w.button = _p.toolbar:CreateButton(
+				config.Id,
+				config.Tooltip or "Toggle " .. config.Id .. " plugin window",
+				config.Icon or DEFAULT_ICON
+			)
+			_w.button.ClickableWhenViewportHidden = true
+
+			_w.action = plugin:CreatePluginAction(
+				config.Id .. "ToggleAction",
+				config.Id,
+				config.Tooltip or "Toggle " .. config.Id .. " plugin window",
+				config.Icon or DEFAULT_ICON,
+				true
+			)
+
+			local function cfgDefault(config: any, key: string, default: boolean): boolean
+				local value = config and config[key] or nil
+				if value ~= nil then
+					return value
+				else
+					return default
 				end
+			end
 
-				if window.state.isOpened:changed() then
-					_w.button:SetActive(window.state.isOpened:get())
+			local isOpenedState = Iris.State(false)
+			wbin(Iris:Connect(function()
+				if config.IrisDemo then
+					Iris.ShowDemoWindow()
+				else
+					local window = Iris.Window({
+						_p.toolbar.Name .. " - " .. config.Id,
+						cfgDefault(config.IrisArgs, "NoTitleBar", false),
+						cfgDefault(config.IrisArgs, "NoBackground", false),
+						cfgDefault(config.IrisArgs, "NoCollapse", true),
+						cfgDefault(config.IrisArgs, "NoClose", false),
+						cfgDefault(config.IrisArgs, "NoMove", false),
+						cfgDefault(config.IrisArgs, "NoScrollbar", false),
+						cfgDefault(config.IrisArgs, "NoResize", false),
+					}, {
+						isOpened = isOpenedState,
+						size = config.DefaultSize and Iris.State(config.DefaultSize) or nil,
+						position = config.DefaultPosition and Iris.State(config.DefaultPosition) or nil,
+					})
+					_w.window = window -- Need it outside of the render cycle
+
+					if _w.callback and isOpenedState:get() then
+						_w.callback(window :: any)
+					end
+
+					if window.state.isOpened:changed() then
+						_w.button:SetActive(window.state.isOpened:get())
+					end
+
+					Iris.End()
 				end
+			end))
 
-				Iris.End()
+			local function onToggle()
+				if not _w.window then
+					return
+				end
+				_w.window.state.isOpened:set(not _w.window.state.isOpened:get())
+				_w.button:SetActive(_w.window.state.isOpened:get())
 			end
-		end))
+			_w.button.Click:Connect(onToggle)
+			_w.action.Triggered:Connect(onToggle)
 
-		local function onToggle()
-			if not window then
-				return
+			function w:IsOpen(): boolean
+				return _w.window.state.isOpened:get()
 			end
-			window.state.isOpened:set(not window.state.isOpened:get())
-			_w.button:SetActive(window.state.isOpened:get())
-		end
-		_w.button.Click:Connect(onToggle)
-		_w.action.Triggered:Connect(onToggle)
 
-		function w:IsOpen(): boolean
-			return window.state.isOpened:get()
-		end
-
-		function w:Toggle(newState: boolean?): boolean
-			if not window then
-				return false
+			function w:Toggle(newState: boolean?): boolean
+				if not _w.window then
+					return false
+				end
+				_w.window.state.isOpened:set(if newState ~= nil then newState else not _w.window.state.isOpened:get())
+				_w.button:SetActive(_w.window.state.isOpened:get())
+				return _w.window.state.isOpened:get()
 			end
-			window.state.isOpened:set(if newState ~= nil then newState else not window.state.isOpened:get())
-			_w.button:SetActive(window.state.isOpened:get())
-			return window.state.isOpened:get()
+
+			function w:SetCallback(callback: (window: IrisWindow) -> ())
+				assert(not _w.callback, "You can only set the callback once for each window.")
+				_w.callback = callback :: any
+			end
+
+			function w:Destroy()
+				wcleanup()
+			end
+
+			return w
 		end
 
-		function w:SetCallback(renderCallback: (iris: typeof(Iris)) -> ())
-			assert(not _w.callback, "You can only set the callback once for each window.")
-			_w.callback = renderCallback
+		function p:Destroy()
+			cleanup()
+			Iris.Shutdown()
+			_p.themeCleanup()
+			_p.screenGui:Destroy()
 		end
 
-		function w:Destroy()
-			wcleanup()
-		end
-
-		return w
-	end
-
-	function p:Destroy()
-		cleanup()
-		Iris.Shutdown()
-		_p.themeCleanup()
-		_p.screenGui:Destroy()
-	end
-
-	return p
-end
+		return p
+	end,
+}
