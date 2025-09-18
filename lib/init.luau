@@ -133,6 +133,7 @@ return {
 				if config.IrisDemo then
 					Iris.ShowDemoWindow()
 				else
+					Iris.PushId("Window/" .. config.Id) -- Fix for elements hopping between windows, recommended by SirMallard in Roblox OSS Community Discord?!?!
 					local window = Iris.Window({
 						_p.toolbar.Name .. " - " .. config.Id,
 						cfgDefault(config.IrisArgs, "NoTitleBar", false),
@@ -158,6 +159,7 @@ return {
 					end
 
 					Iris.End()
+					Iris.PopId()
 				end
 			end)
 
