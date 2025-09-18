@@ -12,6 +12,7 @@ type WindowConfig = {
 
 	Icon: string?,
 	Tooltip: string?,
+	NoToolbar: boolean?,
 
 	IrisArgs: {
 		NoTitleBar: boolean?,
@@ -73,20 +74,22 @@ return {
 			local wbin, wcleanup = Bin()
 			bin(wcleanup)
 
-			_w.button = _p.toolbar:CreateButton(
-				config.Id,
-				config.Tooltip or "Toggle " .. config.Id .. " plugin window",
-				config.Icon or DEFAULT_ICON
-			)
-			_w.button.ClickableWhenViewportHidden = true
+			if not config.NoToolbar then
+				_w.button = _p.toolbar:CreateButton(
+					config.Id,
+					config.Tooltip or "Toggle " .. config.Id .. " plugin window",
+					config.Icon or DEFAULT_ICON
+				)
+				_w.button.ClickableWhenViewportHidden = true
 
-			_w.action = plugin:CreatePluginAction(
-				config.Id .. "ToggleAction",
-				config.Id,
-				config.Tooltip or "Toggle " .. config.Id .. " plugin window",
-				config.Icon or DEFAULT_ICON,
-				true
-			)
+				_w.action = plugin:CreatePluginAction(
+					config.Id .. "ToggleAction",
+					config.Id,
+					config.Tooltip or "Toggle " .. config.Id .. " plugin window",
+					config.Icon or DEFAULT_ICON,
+					true
+				)
+			end
 
 			local function cfgDefault(config: any, key: string, default: boolean): boolean
 				local value = config and config[key] or nil
@@ -122,7 +125,7 @@ return {
 						_w.callback(window :: any)
 					end
 
-					if window.state.isOpened:changed() then
+					if window.state.isOpened:changed() and not config.NoToolbar then
 						_w.button:SetActive(window.state.isOpened:get())
 					end
 
@@ -135,10 +138,14 @@ return {
 					return
 				end
 				_w.window.state.isOpened:set(not _w.window.state.isOpened:get())
-				_w.button:SetActive(_w.window.state.isOpened:get())
+				if not config.NoToolbar then
+					_w.button:SetActive(_w.window.state.isOpened:get())
+				end
 			end
-			_w.button.Click:Connect(onToggle)
-			_w.action.Triggered:Connect(onToggle)
+			if not config.NoToolbar then
+				_w.button.Click:Connect(onToggle)
+				_w.action.Triggered:Connect(onToggle)
+			end
 
 			function w:IsOpen(): boolean
 				return _w.window.state.isOpened:get()
@@ -149,7 +156,9 @@ return {
 					return false
 				end
 				_w.window.state.isOpened:set(if newState ~= nil then newState else not _w.window.state.isOpened:get())
-				_w.button:SetActive(_w.window.state.isOpened:get())
+				if not config.NoToolbar then
+					_w.button:SetActive(_w.window.state.isOpened:get())
+				end
 				return _w.window.state.isOpened:get()
 			end
 
