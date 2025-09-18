@@ -63,6 +63,30 @@ return {
 			IgnoreGuiInset = true,
 		})
 
+		_p.renderCallbacks = {} :: { [string]: () -> () }
+		_p.sortedRenderCallbacks = {} :: { () -> () }
+		function _p.sortCallbacks()
+			_p.sortedRenderCallbacks = {}
+			for _, func in _p.renderCallbacks do
+				table.insert(_p.sortedRenderCallbacks, func)
+			end
+			Iris.ForceRefresh()
+		end
+		function _p.addCallback(id: string, callback: () -> ())
+			_p.renderCallbacks[id] = callback
+			_p.sortCallbacks()
+		end
+		function _p.clearCallback(id: string)
+			_p.renderCallbacks[id] = nil
+			_p.sortCallbacks()
+		end
+
+		bin(Iris:Connect(function()
+			for _, func in _p.sortedRenderCallbacks do
+				func()
+			end
+		end))
+
 		function p:Get(): PluginToolbar
 			return _p.toolbar
 		end
@@ -101,7 +125,11 @@ return {
 			end
 
 			local isOpenedState = Iris.State(false)
-			wbin(Iris:Connect(function()
+
+			wbin(function()
+				_p.clearCallback(config.Id)
+			end)
+			_p.addCallback(config.Id, function()
 				if config.IrisDemo then
 					Iris.ShowDemoWindow()
 				else
@@ -131,7 +159,7 @@ return {
 
 					Iris.End()
 				end
-			end))
+			end)
 
 			local function onToggle()
 				if not _w.window then
